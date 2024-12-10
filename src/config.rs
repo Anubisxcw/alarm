@@ -40,12 +40,14 @@ impl From<toml::de::Error> for ConfigError {
     }
 }
 pub fn load_or_init_config() -> Result<AppConfig, ConfigError> {
-    let config_file = Path::new("../config.toml");
+    let config_file = Path::new("config.toml");
     if config_file.exists() {
+        tracing::info!("config file exists loading...");
         let content = fs::read_to_string(config_file)?;
         let config: AppConfig = toml::from_str(&content)?;
         Ok(config)
     } else {
+        tracing::info!("config file not exists initing...");
         let config = AppConfig::default();
         let content = toml::to_string(&config).unwrap();
         fs::write(config_file, content)?;
