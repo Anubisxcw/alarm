@@ -1,6 +1,8 @@
 mod config;
 mod dbo;
 mod qywx;
+mod alertmanager;
+
 use crate::config::load_or_init_config;
 use crate::dbo::{get_all_data, init_db};
 use crate::qywx::get_wechat_token_with_proxy;
