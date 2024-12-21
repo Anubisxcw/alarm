@@ -25,9 +25,11 @@ pub async fn get_wechat_token_with_proxy(config: &AppConfig) -> Result<String, B
     let proxies = setup_proxies();
     let http_proxy = proxies.get("http").unwrap();
     let https_proxy = proxies.get("https").unwrap();
+    // let client = Client::builder()
+    //     .proxy(Proxy::http(http_proxy.clone())?)
+    //     .proxy(Proxy::https(https_proxy.clone())?)
+    //     .build()?;
     let client = Client::builder()
-        .proxy(Proxy::http(http_proxy.clone())?)
-        .proxy(Proxy::https(https_proxy.clone())?)
         .build()?;
     let response = client.get(&url_wx_token).send().await?;
     let token_response: TokenResponse = response.json().await?;
