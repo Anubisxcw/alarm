@@ -2,15 +2,34 @@ mod config;
 mod dbo;
 mod qywx;
 mod alertmanager;
+mod timer;
 
 use crate::config::load_or_init_config;
 use crate::dbo::{get_all_data, init_db};
 use crate::qywx::get_wechat_token_with_proxy;
 use duckdb:: Connection;
 use tracing::Level;
-
 use tracing_subscriber:: FmtSubscriber;
+use crate::timer::init_timer;
+use lazy_static::lazy_static;
+use std::sync::Mutex;
 
+// 定义全局变量
+lazy_static! {
+    static ref ACCESS_TOKEN: Mutex<String> = Mutex::new(String::new());
+}
+
+// 更新全局变量
+fn update_access_token(new_token: &str) {
+    let mut token = ACCESS_TOKEN.lock().unwrap();
+    *token = new_token.to_string();
+}
+
+// 读取全局变量
+fn get_access_token() -> String {
+    let token = ACCESS_TOKEN.lock().unwrap();
+    token.clone()
+}
 #[tokio::main]
 async fn main() {
     setup_tracing(Level::INFO);
@@ -37,7 +56,8 @@ async fn main() {
     for cluster in cluster_info {
         tracing::info!("{:?} ", cluster);
     }
-    get_wechat_token_with_proxy(&config).await.expect("get token error");
+    tracing::info!("timer is start");
+    init_timer(&config).await.expect("timer init failed");
 }
 
 
